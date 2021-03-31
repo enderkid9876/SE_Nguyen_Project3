@@ -11,7 +11,7 @@ int main() {
   // 'quit' or 'exit' (without quotes).
   while (true) {
     // Display a prompt.
-    cout << "SarahShell> ";
+    cout << "Shell$ ";
 
     // Read in a command from the user.
     argc = read_args(argv);
