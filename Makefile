@@ -9,3 +9,8 @@ main.o: main.cpp prototypes.h
 
 clean_all:
 	rm *.o snazzy_shell
+
+git_push:
+	git add .
+	git commit -m "commit from make"
+	git push -u origin main
