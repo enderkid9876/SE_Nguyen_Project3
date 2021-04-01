@@ -13,7 +13,7 @@ using namespace std;
 // the user on the command line.
 const int MAX_ARGS = 256;
 
-enum PipeRedirect
+enum CommandType
 {
     PIPE,
     REDIRECT,
@@ -21,7 +21,7 @@ enum PipeRedirect
 };
 
 // Splits a user's command into two commands, or a command and a file name.
-PipeRedirect parse_command(int, char **, char **, char **);
+CommandType parse_command(int, char **, char **, char **);
 
 // Pipes the first command's output into the second.
 void pipe_cmd(char **, char **);
