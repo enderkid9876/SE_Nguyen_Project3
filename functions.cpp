@@ -5,10 +5,10 @@
 // into arrays cmd1 and cmd2.  It will return a PipeRedirect enum representing
 // whether there was a pipe in the command, a redirect to a file, or neither.
 // cmd1 and cmd2 will only be populated if there was a pipe or a redirect.
-PipeRedirect parse_command(int argc, char **argv, char **cmd1, char **cmd2)
+CommandType parse_command(int argc, char **argv, char **cmd1, char **cmd2)
 {
     // Assume no pipe or redirect will be found.
-    PipeRedirect result = NEITHER;
+    CommandType result = NEITHER;
 
     // Will hold the index of argv where the pipe or redirect is found.
     int split = -1;
