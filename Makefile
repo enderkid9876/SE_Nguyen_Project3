@@ -12,5 +12,5 @@ clean_all:
 
 git_push:
 	git add .
-	git commit -m "commit from make"
+	git commit -m "$(comment)"
 	git push -u origin main
