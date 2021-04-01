@@ -5,7 +5,7 @@
 int main()
 {
     char *argv[MAX_ARGS], *cmd1[MAX_ARGS], *cmd2[MAX_ARGS];
-    PipeRedirect pipe_redirect;
+    CommandType command_type;
     int argc;
 
     // Keep returning the user to the prompt ad infinitum unless they enter
@@ -18,15 +18,19 @@ int main()
         // Read in a command from the user.
         argc = read_args(argv);
 
+        if (argc == 1 && (strcmp(argv[0], "\n") == 0))
+            continue;
+
         // Decipher the command we just read in and split it, if necessary, into
         // cmd1 and cmd2 arrays.  Set pipe_redirect to a PipeRedirect enum value to
         // indicate whether the given command pipes, redirects, or does neither.
-        pipe_redirect = parse_command(argc, argv, cmd1, cmd2);
+        command_type = parse_command(argc, argv, cmd1, cmd2);
+
 
         // Determine how to handle the user's command(s).
-        if (pipe_redirect == PIPE) // piping
+        if (command_type == PIPE) // piping
             pipe_cmd(cmd1, cmd2);
-        else if (pipe_redirect == REDIRECT) // redirecting
+        else if (command_type == REDIRECT) // redirecting
             redirect_cmd(cmd1, cmd2);
         else
             run_cmd(argc, argv); // neither
