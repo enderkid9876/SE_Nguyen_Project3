@@ -10,7 +10,27 @@ main.o: main.cpp prototypes.h
 clean_all:
 	rm *.o snazzy_shell
 
-git_push:
+pushall:
 	git add .
+	git commit -m "$(comment)"
+	git push -u origin main
+
+pushmain:
+	git add main.cpp
+	git commit -m "$(comment)"
+	git push -u origin main
+
+pushfunc:
+	git add functions.cpp
+	git commit -m "$(comment)"
+	git push -u origin main
+
+pushproto:
+	git add prototypes.cpp
+	git commit -m "$(comment)"
+	git push -u origin main
+
+pushmake:
+	git add Makefile
 	git commit -m "$(comment)"
 	git push -u origin main
