@@ -5,7 +5,7 @@
 // into arrays cmd1 and cmd2.  It will return a PipeRedirect enum representing
 // whether there was a pipe in the command, a redirect to a file, or neither.
 // cmd1 and cmd2 will only be populated if there was a pipe or a redirect.
-CommandType parse_command(int argc, char **argv, char **cmd1, char **cmd2)
+CommandType parse_command(int &argc, char **argv, char **cmd1, char **cmd2)
 {
     // Assume no pipe or redirect will be found.
     CommandType result = NEITHER;
@@ -29,7 +29,28 @@ CommandType parse_command(int argc, char **argv, char **cmd1, char **cmd2)
             result = REDIRECT;
             split = i;
         }
+
+        for (size_t k = 0; k < strlen(argv[i]); k++)
+        {
+            if (argv[i][k] == ';')
+            {
+                result = SEPARATED;
+
+                for (int g = argc; g > i; g--)
+                    argv[g] = argv[g - 1];
+
+                argv[i + 1] = ";";
+
+                argv[i][k] = ' ';
+
+                split = i + 1;
+            }
+            
+        }
+        
+
     }
+    
 
     // If either a pipe or a redirect was found...
     if (result != NEITHER)

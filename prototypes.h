@@ -17,11 +17,12 @@ enum CommandType
 {
     PIPE,
     REDIRECT,
+    SEPARATED,
     NEITHER
 };
 
 // Splits a user's command into two commands, or a command and a file name.
-CommandType parse_command(int, char **, char **, char **);
+CommandType parse_command(int &, char **, char **, char **);
 
 // Pipes the first command's output into the second.
 void pipe_cmd(char **, char **);

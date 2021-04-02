@@ -28,6 +28,13 @@ int main()
             pipe_cmd(cmd1, cmd2);
         else if (command_type == REDIRECT) // redirecting
             redirect_cmd(cmd1, cmd2);
+        else if (command_type == SEPARATED)
+        {
+            for (size_t i = 0; cmd1[i] != NULL; i++)
+                cout << cmd1[i];
+            
+        }
+        
         else
             run_cmd(argc, argv); // neither
 
