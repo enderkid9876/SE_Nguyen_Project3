@@ -23,9 +23,6 @@ int main()
         // indicate whether the given command pipes, redirects, or does neither.
         command_type = parse_command(argc, argv, cmd1, cmd2);
 
-        if (argc == 1 && (strcmp(argv[0], "\n") == 0))
-            continue;
-
         // Determine how to handle the user's command(s).
         if (command_type == PIPE) // piping
             pipe_cmd(cmd1, cmd2);
