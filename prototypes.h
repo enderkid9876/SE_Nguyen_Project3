@@ -22,22 +22,22 @@ enum CommandType
 };
 
 // Splits a user's command into two commands, or a command and a file name.
-CommandType parse_command(int &, char **, char **, char **);
+CommandType parseCommand(int &, char **, char **, char **);
 
 // Pipes the first command's output into the second.
-void pipe_cmd(char **, char **);
+void pipeCommands(char **, char **);
 
 // Reads input from the user into the given array and returns the number of
 // arguments taken in.
-int read_args(char **);
+int readInputs(char **);
 
 // Redirects the output from the given command into the given file.
-void redirect_cmd(char **, char **);
+void redirectCommands(char **, char **);
 
 // Given the number of arguments and an array of arguments, this will execute
 // those arguments.  The first argument in the array should be a command.
-void run_cmd(int, char **);
+void singleCommands(int, char **);
 
 // Given a string of user input, this will determine if the user wants to
 // quit the shell.
-bool want_to_quit(string);
+bool quitCheck(string);

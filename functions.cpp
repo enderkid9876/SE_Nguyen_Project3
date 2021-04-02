@@ -1,14 +1,13 @@
 #include "prototypes.h"
 
-// Given the number of arguments (argc) in an array of arguments (argv), this
-// will go through those arguments and, if necessary, bifurcate the arguments
-// into arrays cmd1 and cmd2.  It will return a PipeRedirect enum representing
-// whether there was a pipe in the command, a redirect to a file, or neither.
-// cmd1 and cmd2 will only be populated if there was a pipe or a redirect.
-CommandType parse_command(int &argc, char **argv, char **cmd1, char **cmd2)
+
+CommandType parseCommand(int &argc, char **argv, char **cmd1, char **cmd2)
 {
     // Assume no pipe or redirect will be found.
-    CommandType result = NEITHER;
+    CommandType type = NEITHER;
+    string arg = ";";
+
+    char *cstr;
 
     // Will hold the index of argv where the pipe or redirect is found.
     int split = -1;
@@ -19,14 +18,14 @@ CommandType parse_command(int &argc, char **argv, char **cmd1, char **cmd2)
         // Pipe found!
         if (strcmp(argv[i], "|") == 0)
         {
-            result = PIPE;
+            type = PIPE;
             split = i;
 
             // Redirect found!
         }
         else if (strcmp(argv[i], ">>") == 0)
         {
-            result = REDIRECT;
+            type = REDIRECT;
             split = i;
         }
 
@@ -34,12 +33,14 @@ CommandType parse_command(int &argc, char **argv, char **cmd1, char **cmd2)
         {
             if (argv[i][k] == ';')
             {
-                result = SEPARATED;
+                type = SEPARATED;
 
                 for (int g = argc; g > i; g--)
                     argv[g] = argv[g - 1];
 
-                argv[i + 1] = ";";
+                cstr = new char[arg.size() + 1];
+                strcpy(cstr, arg.c_str());
+                argv[i + 1] = cstr;
 
                 argv[i][k] = ' ';
 
@@ -48,12 +49,11 @@ CommandType parse_command(int &argc, char **argv, char **cmd1, char **cmd2)
             
         }
         
-
     }
     
 
     // If either a pipe or a redirect was found...
-    if (result != NEITHER)
+    if (type != NEITHER)
     {
         // Go through the array of arguments up to the point where the
         // pipe/redirect was found and store each of those arguments in cmd1.
@@ -76,11 +76,11 @@ CommandType parse_command(int &argc, char **argv, char **cmd1, char **cmd2)
     }
 
     // Return an enum showing whether a pipe, redirect, or neither was found.
-    return result;
+    return type;
 }
 
 // This pipes the output of cmd1 into cmd2.
-void pipe_cmd(char **cmd1, char **cmd2)
+void pipeCommands(char **cmd1, char **cmd2)
 {
     int fds[2]; // file descriptors
     pipe(fds);
@@ -98,7 +98,7 @@ void pipe_cmd(char **cmd1, char **cmd2)
 
         // Execute the second command.
         execvp(cmd2[0], cmd2);
-        perror("execvp failed");
+        perror("execvp failed. Command not found or doesn't exists\n");
 
         // child process #2
     }
@@ -113,7 +113,7 @@ void pipe_cmd(char **cmd1, char **cmd2)
 
         // Execute the first command.
         execvp(cmd1[0], cmd1);
-        perror("execvp failed\n");
+        perror("execvp failed. Command not found or doesn't exists\n");
 
         // parent process
     }
@@ -124,7 +124,7 @@ void pipe_cmd(char **cmd1, char **cmd2)
 // This will get input from the user, split the input into arguments, insert
 // those arguments into the given array, and return the number of arguments as
 // an integer.
-int read_args(char **argv)
+int readInputs(char **argv)
 {
     char *cstr;
     string arg;
@@ -134,11 +134,8 @@ int read_args(char **argv)
     while (cin >> arg)
     {
         // Let the user exit out if their input suggests they want to.
-        if (want_to_quit(arg))
-        {
-            cout << "Goodbye!\n";
+        if (quitCheck(arg))
             exit(0);
-        }
 
         // Convert that std::string into a C string.
         cstr = new char[arg.size() + 1];
@@ -160,7 +157,7 @@ int read_args(char **argv)
     return argc;
 }
 
-void redirect_cmd(char **cmd, char **file)
+void redirectCommands(char **cmd, char **file)
 {
     int fds[2]; // file descriptors
     int count;  // used for reading from stdout
@@ -173,8 +170,6 @@ void redirect_cmd(char **cmd, char **file)
     // child process #1
     if (fork() == 0)
     {
-        // Thanks to http://linux.die.net/man/2/open for showing which headers
-        // need to be included to use this function and its flags.
         fd = open(file[0], O_RDWR | O_CREAT, 0666);
 
         // open() returns a -1 if an error occurred
@@ -193,12 +188,6 @@ void redirect_cmd(char **cmd, char **file)
         while ((count = read(0, &c, 1)) > 0)
             write(fd, &c, 1); // Write to file.
 
-        // Okay, so this is a bit contrived, but when I didn't have any kind of exec
-        // function call here, I got my SarahShell prompt repeated over and over
-        // again on the Multilab machines, I think because of this crazy child
-        // process or something.  When I put this execlp here with the useless call
-        // to echo, however, that looping stops and you can actually enter things
-        // at the prompt again, hurray!
         execlp("echo", "echo", NULL);
 
         // child process #2
@@ -224,11 +213,8 @@ void redirect_cmd(char **cmd, char **file)
     }
 }
 
-// Given the number of arguments (argc) and an array of arguments (argv),
-// this will fork a new process and run those arguments.
-// Thanks to http://tldp.org/LDP/lpg/node11.html for their tutorial on pipes
-// in C, which allowed me to handle user input with ampersands.
-void run_cmd(int argc, char **argv)
+
+void singleCommands(int argc, char **argv)
 {
     pid_t pid;
     const char *amp;
@@ -269,7 +255,7 @@ void run_cmd(int argc, char **argv)
 
 // Given a string of user input, this determines whether or not the user
 // wants to exit the shell.
-bool want_to_quit(string choice)
+bool quitCheck(string choice)
 {
     // Lowercase the user input
     for (unsigned int i = 0; i < choice.length(); i++)
